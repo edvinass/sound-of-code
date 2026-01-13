@@ -4,7 +4,8 @@ This repository is set up for **live coding with SuperCollider + TidalCycles** a
 
 ### For Humans
 
-- See `agents.md` for the exact tutoring and interaction contract that AI agents should follow.
+- **Installation**: See [`INSTALL-macOS.md`](INSTALL-macOS.md) for macOS setup instructions.
+- **AI Tutor Guide**: See [`agents.md`](agents.md) for the exact tutoring and interaction contract that AI agents should follow.
 - The intent of this repo is to:
   - Document a stable **SuperCollider / SuperDirt / TidalCycles** workflow.
   - Capture recipes, exercises, and patterns as you learn.
