@@ -1,0 +1,17 @@
+-- First Tidal Pattern
+-- A groovy drum pattern with kick, snare, and hi-hats
+
+d1 $ sound "bd ~ bd ~ bd ~ bd ~"
+d2 $ sound "~ ~ sd ~ ~ ~ sd ~"
+d3 $ sound "hh*8"
+
+-- Optional: Add some variation and effects
+-- Uncomment these lines to try them out:
+-- d1 $ sound "bd ~ bd ~ bd ~ bd ~" # gain 1.2
+-- d3 $ sound "hh*8" # pan (sine) # speed 1.2
+
+-- To play this:
+-- 1. Make sure SuperDirt is running in SuperCollider
+-- 2. Boot Tidal in your editor
+-- 3. Place cursor on each line and press Shift+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+-- 4. You should hear: kick on every beat, snare on beats 3 and 7, hi-hats throughout
