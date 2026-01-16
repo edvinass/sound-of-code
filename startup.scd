@@ -10,15 +10,8 @@ s.reboot { // server options are only updated on reboot
     s.options.numInputBusChannels = 2; // set this to your hardware output channel size, if necessary
     // boot the server and start SuperDirt
     s.waitForBoot {
-        // Check if required quarks are installed
-        if (Vowel.isNil, {
-            "ERROR: Vowel quark is not installed. SuperDirt requires Vowel.".postln;
-            "To install, run in SuperCollider:".postln;
-            "Quarks.checkForUpdates({Quarks.install(\"Vowel\"); thisProcess.recompile()})".postln;
-            "Or reinstall SuperDirt which will install Vowel automatically:".postln;
-            "Quarks.checkForUpdates({Quarks.install(\"SuperDirt\", \"v1.7.3\"); thisProcess.recompile()})".postln;
-        }, {
-            // Vowel is available, proceed with SuperDirt
+        // Try to start SuperDirt, catch errors if Vowel is missing
+        try {
             ~dirt = SuperDirt(2, s); // two output channels, increase if you want to pan across more channels
             ~dirt.loadSoundFiles;   // load samples (path containing a wildcard can be passed in)
             // for example: ~dirt.loadSoundFiles("/Users/myUserName/Dirt/samples/*");
@@ -34,7 +27,18 @@ s.reboot { // server options are only updated on reboot
             );
             
             "SuperDirt: listening to Tidal on port 57120".postln;
-        });
+        } { |error|
+            "ERROR: Failed to start SuperDirt.".postln;
+            error.errorString.postln;
+            if (error.errorString.contains("Vowel") or: { error.errorString.contains("formLib") }, {
+                "".postln;
+                "The Vowel quark is missing. SuperDirt requires Vowel.".postln;
+                "To install, run in SuperCollider:".postln;
+                "Quarks.checkForUpdates({Quarks.install(\"Vowel\"); thisProcess.recompile()})".postln;
+                "Or reinstall SuperDirt which will install Vowel automatically:".postln;
+                "Quarks.checkForUpdates({Quarks.install(\"SuperDirt\", \"v1.7.3\"); thisProcess.recompile()})".postln;
+            });
+        };
     };
 
     s.latency = 0.3; // increase this if you get "late" messages

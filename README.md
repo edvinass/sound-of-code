@@ -4,8 +4,9 @@ This repository is set up for **live coding with SuperCollider + TidalCycles** a
 
 ### For Humans
 
-- **Installation**: See [`INSTALL-macOS.md`](INSTALL-macOS.md) for macOS setup instructions.
-- **Starting Tidal**: See [`START-Tidal.md`](START-Tidal.md) for how to launch SuperCollider, SuperDirt, and TidalCycles.
+- **Quick Install**: Run `./install-tidal.sh` to automatically install all required components (macOS only).
+- **Installation Guide**: See [`INSTALL-macOS.md`](INSTALL-macOS.md) for detailed macOS setup instructions.
+- **Starting Tidal**: Run `./start-tidal.sh` or see [`START-Tidal.md`](START-Tidal.md) for manual startup instructions.
 - **Using SuperCollider**: See [`GUIDE-SuperCollider.md`](GUIDE-SuperCollider.md) for SuperCollider basics and usage.
 - **AI Tutor Guide**: See [`agents.md`](agents.md) for the exact tutoring and interaction contract that AI agents should follow.
 - The intent of this repo is to:
