@@ -206,7 +206,7 @@ if [ "$NEEDS_XCODE" = false ] && [ "$NEEDS_HASKELL" = false ] && [ "$NEEDS_TIDAL
    [ "$NEEDS_SUPERCOLLIDER" = false ] && [ "$NEEDS_SUPERDIRT" = false ] && [ "$NEEDS_VOWEL" = false ] && \
    [ "$NEEDS_PULSAR" = false ] && [ "$NEEDS_PULSAR_PLUGIN" = false ]; then
     echo -e "${GREEN}All components are already installed!${NC}\n"
-    echo -e "${CYAN}You can run ./start-tidal.sh to start TidalCycles.${NC}\n"
+    echo -e "${CYAN}You can run ./start.sh to start TidalCycles.${NC}\n"
     exit 0
 fi
 
@@ -736,7 +736,7 @@ if [ "$NEEDS_PULSAR" = true ] || [ "$NEEDS_PULSAR_PLUGIN" = true ]; then
 fi
 
 echo -e "${YELLOW}3. Start TidalCycles${NC}"
-echo -e "   ${CYAN}Run: ${GREEN}./start-tidal.sh${NC}"
+echo -e "   ${CYAN}Run: ${GREEN}./start.sh${NC}"
 echo -e "   ${CYAN}This will:${NC}"
 echo -e "     • Launch SuperCollider with SuperDirt"
 echo -e "     • Open Pulsar (or your editor)"

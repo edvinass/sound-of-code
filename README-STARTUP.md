@@ -7,7 +7,7 @@ This directory contains scripts to automate the startup process for TidalCycles 
 Run the startup script:
 
 ```bash
-./start-tidal.sh
+./start.sh
 ```
 
 This will:
@@ -18,7 +18,7 @@ This will:
 
 ## Files
 
-### `start-tidal.sh`
+### `start.sh`
 The main startup script that automates the entire launch process.
 
 **Features:**
@@ -30,8 +30,8 @@ The main startup script that automates the entire launch process.
 
 **Usage:**
 ```bash
-chmod +x start-tidal.sh  # Make executable (first time only)
-./start-tidal.sh
+chmod +x start.sh  # Make executable (first time only)
+./start.sh
 ```
 
 ### `startup.scd`
@@ -49,7 +49,7 @@ The SuperCollider startup script that automatically starts SuperDirt when SuperC
 - Sets up orbit variables (~d1 through ~d12)
 
 **Customization:**
-You can edit `startup.scd` in this repo and re-run `start-tidal.sh` to update it. The script will automatically back up your existing startup file.
+You can edit `startup.scd` in this repo and re-run `start.sh` to update it. The script will automatically back up your existing startup file.
 
 ## Manual Steps After Running the Script
 
@@ -115,7 +115,7 @@ After the script completes:
 If you want to customize the SuperCollider startup:
 
 1. Edit `startup.scd` in this repo
-2. Re-run `start-tidal.sh` to install the updated version
+2. Re-run `start.sh` to install the updated version
 3. Your previous startup file will be backed up automatically
 
 ### Disable Auto-Start

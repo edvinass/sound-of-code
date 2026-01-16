@@ -19,7 +19,7 @@ By the end of this tutorial, you'll be able to:
 ## Prerequisites
 
 Before starting, make sure you have:
-- ✅ Installed all components (run `./install-tidal.sh` if needed)
+- ✅ Installed all components (run `./install.sh` if needed)
 - ✅ A text editor (Pulsar, VS Code, or similar)
 - ✅ Headphones or speakers connected
 
@@ -32,7 +32,7 @@ Before starting, make sure you have:
 **Option A: Use the startup script (Easiest)**
 
 ```bash
-./start-tidal.sh
+./start.sh
 ```
 
 This automatically:
