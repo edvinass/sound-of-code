@@ -81,6 +81,14 @@ After the script completes:
 ### SuperDirt Not Starting
 - Check SuperCollider's post window for errors
 - Verify SuperDirt is installed: `Language → Quarks → SuperDirt` should be checked
+- **Vowel quark missing**: If you see "Class 'Vowel' not found", install Vowel:
+  ```supercollider
+  Quarks.checkForUpdates({Quarks.install("Vowel"); thisProcess.recompile()})
+  ```
+  Or reinstall SuperDirt (which installs Vowel automatically):
+  ```supercollider
+  Quarks.checkForUpdates({Quarks.install("SuperDirt", "v1.7.3"); thisProcess.recompile()})
+  ```
 - Try restarting SuperCollider manually
 
 ### No Sound
@@ -96,6 +104,10 @@ After the script completes:
 ### Port Already in Use
 - Another instance of SuperCollider may be running
 - Quit all SuperCollider instances and try again
+
+### "Exceeded number of interconnect buffers"
+- The startup script now sets `numWireBufs = 128` (increased from 64)
+- If you still see this error, you can increase it further in `startup.scd`
 
 ## Advanced Usage
 
