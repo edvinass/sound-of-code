@@ -1,17 +1,58 @@
--- First Tidal Pattern
--- A groovy drum pattern with kick, snare, and hi-hats
+-- A Classical Masterpiece in TidalCycles
+-- Multi-layered composition with bass, melody, and rhythm
 
-d1 $ sound "bd ~ bd ~ bd ~ bd ~"
-d2 $ sound "~ ~ sd ~ ~ ~ sd ~"
-d3 $ sound "hh*8"
+-- Bass foundation: Deep, resonant foundation
+d1 $ s "bd ~ bd ~ bd*2 ~ bd ~"
+   # gain 0.8
+   # lpf 400
 
--- Optional: Add some variation and effects
--- Uncomment these lines to try them out:
--- d1 $ sound "bd ~ bd ~ bd ~ bd ~" # gain 1.2
--- d3 $ sound "hh*8" # pan (sine) # speed 1.2
+-- Melodic line: Flowing harmonic progression
+d2 $ s "~ hh:2 hh:3 ~ hh:4 hh:2 ~ hh:5"
+   # gain 0.7
+   # speed 1.3
+   # pan sine
 
--- To play this:
--- 1. Make sure SuperDirt is running in SuperCollider
--- 2. Boot Tidal in your editor
--- 3. Place cursor on each line and press Shift+Enter (Mac) or Ctrl+Enter (Windows/Linux)
--- 4. You should hear: kick on every beat, snare on beats 3 and 7, hi-hats throughout
+-- Rhythmic texture: Graceful percussion
+0d3 $ s "~ ~ cp ~ cp ~ ~ cp"
+   # gain 0.6
+   # pan (sine + 0.2)
+   # room 0.2
+
+-- Harmonic layer: Rich chord-like structure
+d4 $ s "~ ~ ~ hh:5 ~ hh:7 ~ hh:5"
+   # gain 0.5
+   # speed 0.9
+   # room 0.4
+   # pan (sine - 0.2)
+
+-- Counter-melody: Delicate higher register
+d5 $ s "hh:1 ~ ~ hh:2 ~ hh:1 ~ hh:3"
+   # gain 0.6
+   # speed 1.6
+   # pan (sine + 0.4)
+   # room 0.3
+
+d1 $ note "c a f e" # s "supermandolin"
+
+d6 $ sound "[voodoo voodoo:3, arpy arpy:4 arpy:2]"
+
+d1 $ sound "[voodoo voodoo:3, arpy arpy:4 arpy:2]"
+d2 $ sound "{voodoo voodoo:3, arpy arpy:4 arpy:2}"
+d3 $ sound "[drum bd hh bd, can can:2 can:3 can:4 can:2]"
+d4 $ sound "{drum bd hh bd, can can:2 can:3 can:4 can:2}"
+d5 $ sound "[bd sn, can:2 can:3 can:1, arpy arpy:1 arpy:2 arpy:3 arpy:5]"
+d6 $ sound "{bd sn, can:2 can:3 can:1, arpy arpy:1 arpy:2 arpy:3 arpy:5}"
+
+d1 silence
+d2 silence
+d3 silence
+d4 silence
+d5 silence
+d6 silence
+
+-- Instructions:
+-- 1. Evaluate each line (d1-d5) one by one with Shift+Enter
+-- 2. All layers will play together creating a rich, classical texture
+-- 3. To stop: d1 silence, d2 silence, etc.
+-- 4. To adjust tempo: setcps 0.7 (slower, more contemplative) or setcps 1.1 (faster, more energetic)
+-- 5. Try: d1 $ silence to mute just the bass, or d2 $ silence to mute the melody
