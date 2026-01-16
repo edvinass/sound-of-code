@@ -204,14 +204,35 @@ echo ""
 
 # Install Xcode Command Line Tools
 if [ "$NEEDS_XCODE" = true ]; then
-    echo -e "${BLUE}Installing Xcode Command Line Tools...${NC}"
-    echo -e "${YELLOW}This will open a dialog. Please follow the prompts.${NC}"
-    /usr/bin/xcode-select --install || {
-        echo -e "${GREEN}✓ Xcode Command Line Tools installation initiated${NC}"
-        echo -e "${YELLOW}Please complete the installation dialog, then press Enter to continue...${NC}"
-        read
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}Step: Installing Xcode Command Line Tools${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+    
+    echo -e "${CYAN}Xcode Command Line Tools are required for building software.${NC}\n"
+    echo -e "${YELLOW}This will open a system dialog.${NC}"
+    echo -e "${CYAN}Steps:${NC}"
+    echo -e "  1. A dialog will appear asking to install Command Line Tools"
+    echo -e "  2. Click ${GREEN}'Install'${NC}"
+    echo -e "  3. Accept the license agreement"
+    echo -e "  4. Wait for installation (20-30 minutes)"
+    echo -e "  5. Come back here and press Enter when done\n"
+    
+    read -p "Press Enter to open the installation dialog... "
+    
+    /usr/bin/xcode-select --install 2>/dev/null || {
+        echo -e "${GREEN}✓ Installation dialog opened${NC}"
     }
-    echo ""
+    
+    echo -e "\n${YELLOW}⚠ Installation is running in the background.${NC}"
+    echo -e "${CYAN}Please complete the installation dialog, then come back here.${NC}\n"
+    read -p "Press Enter when Xcode Command Line Tools installation is complete... "
+    
+    # Verify installation
+    if xcode-select -p &>/dev/null; then
+        echo -e "${GREEN}✓ Xcode Command Line Tools verified${NC}\n"
+    else
+        echo -e "${YELLOW}⚠ Could not verify installation. Continuing anyway...${NC}\n"
+    fi
 fi
 
 # Install Haskell via ghcup
@@ -277,43 +298,143 @@ if [ "$NEEDS_SUPERDIRT" = true ] || [ "$NEEDS_VOWEL" = true ]; then
         exit 1
     fi
     
-    echo -e "${BLUE}Installing SuperCollider Quarks...${NC}"
-    echo -e "${YELLOW}Quark installation requires SuperCollider to be running.${NC}"
-    echo -e "${YELLOW}Opening SuperCollider and installation script...${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}Step: Installing SuperCollider Quarks${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
     
-    # Open SuperCollider
-    open -a SuperCollider
-    sleep 3
+    echo -e "${CYAN}Quark installation requires SuperCollider to be running.${NC}"
+    echo -e "${CYAN}I'll guide you through this step-by-step.${NC}\n"
     
     # Check if install-quarks.scd exists in the repo
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     QUARK_SCRIPT="${SCRIPT_DIR}/install-quarks.scd"
     
+    if [ "$NEEDS_VOWEL" = true ]; then
+        echo -e "${YELLOW}⚠ Vowel quark is missing (required for SuperDirt)${NC}"
+    fi
+    if [ "$NEEDS_SUPERDIRT" = true ]; then
+        echo -e "${YELLOW}⚠ SuperDirt quark is missing${NC}"
+    fi
+    echo ""
+    
+    echo -e "${CYAN}Method 1: Using the installation script (Recommended)${NC}\n"
+    echo -e "${YELLOW}Step 1:${NC} I'll open SuperCollider for you..."
+    read -p "Press Enter to open SuperCollider... "
+    
+    # Open SuperCollider
+    open -a SuperCollider
+    sleep 4
+    
     if [ -f "$QUARK_SCRIPT" ]; then
-        # Open the script in SuperCollider
+        echo -e "${YELLOW}Step 2:${NC} Opening the installation script in SuperCollider..."
         open -a SuperCollider "$QUARK_SCRIPT"
-        echo -e "${CYAN}Installation script opened in SuperCollider.${NC}"
-        echo -e "${CYAN}Please:${NC}"
-        echo -e "${CYAN}1. Select all text in SuperCollider (Cmd+A)${NC}"
-        echo -e "${CYAN}2. Press Cmd+Enter to run${NC}"
-        echo -e "${CYAN}3. Wait for compilation to complete${NC}"
-        echo -e "${CYAN}4. Restart SuperCollider${NC}"
-    else
-        echo -e "${YELLOW}Installation script not found. Please manually install:${NC}"
-        echo -e "${CYAN}1. In SuperCollider, paste and run:${NC}"
+        sleep 2
+        
+        echo -e "${GREEN}✓ Installation script opened in SuperCollider${NC}\n"
+        echo -e "${CYAN}Now follow these steps in SuperCollider:${NC}\n"
+        echo -e "${YELLOW}  Step 3:${NC} Select all text in the editor (${CYAN}Cmd+A${NC})"
+        echo -e "${YELLOW}  Step 4:${NC} Run the code (${CYAN}Cmd+Enter${NC})"
+        echo -e "${YELLOW}  Step 5:${NC} Watch the post window (bottom) for messages like:"
+        echo -e "         ${GREEN}✓ SuperDirt is already installed${NC}"
+        echo -e "         ${GREEN}✓ Vowel installed${NC}"
+        echo -e "         ${GREEN}compiling class library...${NC}\n"
+        echo -e "${CYAN}The installation will:${NC}"
         if [ "$NEEDS_SUPERDIRT" = true ]; then
-            echo -e "${CYAN}   Quarks.checkForUpdates({Quarks.install(\"SuperDirt\", \"v1.7.3\"); thisProcess.recompile()})${NC}"
+            echo -e "  • Install SuperDirt quark"
         fi
         if [ "$NEEDS_VOWEL" = true ]; then
-            echo -e "${CYAN}   Quarks.checkForUpdates({Quarks.install(\"Vowel\"); thisProcess.recompile()})${NC}"
+            echo -e "  • Install Vowel quark"
         fi
-        echo -e "${CYAN}2. Wait for compilation to complete${NC}"
-        echo -e "${CYAN}3. Restart SuperCollider${NC}"
+        echo -e "  • Recompile the class library (this takes 10-30 seconds)\n"
+    else
+        echo -e "${YELLOW}Installation script not found. Using manual method...${NC}\n"
+        echo -e "${CYAN}In SuperCollider, paste and run this code:${NC}\n"
+        
+        if [ "$NEEDS_VOWEL" = true ]; then
+            echo -e "${GREEN}Quarks.checkForUpdates({Quarks.install(\"Vowel\"); thisProcess.recompile()})${NC}\n"
+        fi
+        if [ "$NEEDS_SUPERDIRT" = true ]; then
+            echo -e "${GREEN}Quarks.checkForUpdates({Quarks.install(\"SuperDirt\", \"v1.7.3\"); thisProcess.recompile()})${NC}\n"
+        fi
+        
+        echo -e "${CYAN}Steps:${NC}"
+        echo -e "  1. Copy the code above"
+        echo -e "  2. Paste it into SuperCollider's editor"
+        echo -e "  3. Select the line and press ${CYAN}Cmd+Enter${NC}"
+        echo -e "  4. Wait for compilation to complete\n"
+    fi
+    
+    echo -e "${BLUE}───────────────────────────────────────────────────────────${NC}"
+    echo -e "${YELLOW}⚠ Important: Wait for compilation to finish!${NC}"
+    echo -e "${CYAN}You'll see messages in the post window. When you see:${NC}"
+    echo -e "${GREEN}  *** Welcome to SuperCollider 3.x.x ***${NC}"
+    echo -e "${CYAN}compilation is complete.${NC}\n"
+    echo -e "${BLUE}───────────────────────────────────────────────────────────${NC}\n"
+    
+    read -p "Press Enter when compilation is complete and you've restarted SuperCollider... "
+    
+    # Verify installation
+    echo -e "\n${YELLOW}Verifying installation...${NC}"
+    sleep 2
+    
+    # Create verification script
+    TEMP_VERIFY_SCRIPT=$(mktemp /tmp/verify_quarks_XXXXXX.scd)
+    cat > "$TEMP_VERIFY_SCRIPT" << 'EOF'
+(
+var quarks = Quarks.installed;
+var superdirtInstalled = quarks.any({ |q| q.name == "SuperDirt" });
+var vowelInstalled = quarks.any({ |q| q.name == "Vowel" });
+
+if (superdirtInstalled, {
+    "SUPERDIRT_OK".postln;
+}, {
+    "SUPERDIRT_MISSING".postln;
+});
+
+if (vowelInstalled, {
+    "VOWEL_OK".postln;
+}, {
+    "VOWEL_MISSING".postln;
+});
+
+0.exit;
+)
+EOF
+
+    SC_LANG="/Applications/SuperCollider.app/Contents/Resources/sclang"
+    if [ -f "$SC_LANG" ]; then
+        VERIFY_OUTPUT=$("$SC_LANG" "$TEMP_VERIFY_SCRIPT" 2>/dev/null || true)
+        rm -f "$TEMP_VERIFY_SCRIPT"
+        
+        ALL_OK=true
+        if [ "$NEEDS_SUPERDIRT" = true ] && ! echo "$VERIFY_OUTPUT" | grep -q "SUPERDIRT_OK"; then
+            echo -e "${RED}✗ SuperDirt still not installed${NC}"
+            ALL_OK=false
+        elif [ "$NEEDS_SUPERDIRT" = true ]; then
+            echo -e "${GREEN}✓ SuperDirt verified${NC}"
+        fi
+        
+        if [ "$NEEDS_VOWEL" = true ] && ! echo "$VERIFY_OUTPUT" | grep -q "VOWEL_OK"; then
+            echo -e "${RED}✗ Vowel still not installed${NC}"
+            ALL_OK=false
+        elif [ "$NEEDS_VOWEL" = true ]; then
+            echo -e "${GREEN}✓ Vowel verified${NC}"
+        fi
+        
+        if [ "$ALL_OK" = true ]; then
+            echo -e "${GREEN}✓ All quarks installed successfully!${NC}\n"
+        else
+            echo -e "${YELLOW}⚠ Some quarks are still missing.${NC}"
+            echo -e "${YELLOW}Please try the installation again in SuperCollider.${NC}\n"
+            read -p "Press Enter to continue anyway, or Ctrl+C to exit and try again... "
+        fi
+    else
+        echo -e "${YELLOW}⚠ Could not verify installation automatically${NC}"
+        echo -e "${CYAN}Please verify manually in SuperCollider:${NC}"
+        echo -e "${CYAN}  Language → Quarks → Check for SuperDirt and Vowel${NC}\n"
     fi
     
     echo ""
-    read -p "Press Enter after you've completed the quark installation in SuperCollider... "
-    echo -e "${GREEN}✓ Quark installation complete${NC}\n"
 fi
 
 # Final summary
