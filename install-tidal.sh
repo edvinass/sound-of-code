@@ -20,6 +20,8 @@ NEEDS_TIDAL=false
 NEEDS_SUPERCOLLIDER=false
 NEEDS_SUPERDIRT=false
 NEEDS_VOWEL=false
+NEEDS_PULSAR=false
+NEEDS_PULSAR_PLUGIN=false
 
 echo -e "${BLUE}=== TidalCycles Installation Script ===${NC}\n"
 echo -e "${CYAN}This script will check and install all required components.${NC}"
@@ -165,19 +167,44 @@ else
     NEEDS_VOWEL=true
 fi
 
-# 6. Check Pulsar (optional)
-echo -e "${YELLOW}[6/6] Checking Pulsar (optional editor)...${NC}"
+# 6. Check Pulsar
+echo -e "${YELLOW}[6/7] Checking Pulsar editor...${NC}"
 if dir_exists "/Applications/Pulsar.app"; then
-    echo -e "${GREEN}✓ Pulsar found${NC}\n"
+    echo -e "${GREEN}✓ Pulsar found${NC}"
+    
+    # Check for TidalCycles plugin
+    if [ -d "$HOME/.pulsar/packages/tidalcycles" ]; then
+        echo -e "${GREEN}✓ TidalCycles plugin found${NC}\n"
+    else
+        echo -e "${YELLOW}⚠ TidalCycles plugin not found${NC}"
+        NEEDS_PULSAR_PLUGIN=true
+        echo -e "${YELLOW}  Will install TidalCycles plugin...${NC}\n"
+    fi
 else
-    echo -e "${YELLOW}⚠ Pulsar not found (optional - you can use another editor)${NC}\n"
+    echo -e "${YELLOW}✗ Pulsar not found${NC}"
+    NEEDS_PULSAR=true
+    echo -e "${YELLOW}  Will install Pulsar...${NC}\n"
+fi
+
+# 7. Check Homebrew (needed for Pulsar installation)
+if [ "$NEEDS_PULSAR" = true ]; then
+    echo -e "${YELLOW}[7/7] Checking Homebrew (for Pulsar installation)...${NC}"
+    if command_exists brew; then
+        echo -e "${GREEN}✓ Homebrew found${NC}\n"
+    else
+        echo -e "${YELLOW}⚠ Homebrew not found${NC}"
+        echo -e "${YELLOW}  Pulsar can be installed via Homebrew or manually downloaded${NC}\n"
+    fi
+else
+    echo -e "${YELLOW}[7/7] Skipping Homebrew check (Pulsar already installed)${NC}\n"
 fi
 
 # Summary
 echo -e "${BLUE}=== Installation Summary ===${NC}\n"
 
 if [ "$NEEDS_XCODE" = false ] && [ "$NEEDS_HASKELL" = false ] && [ "$NEEDS_TIDAL" = false ] && \
-   [ "$NEEDS_SUPERCOLLIDER" = false ] && [ "$NEEDS_SUPERDIRT" = false ] && [ "$NEEDS_VOWEL" = false ]; then
+   [ "$NEEDS_SUPERCOLLIDER" = false ] && [ "$NEEDS_SUPERDIRT" = false ] && [ "$NEEDS_VOWEL" = false ] && \
+   [ "$NEEDS_PULSAR" = false ] && [ "$NEEDS_PULSAR_PLUGIN" = false ]; then
     echo -e "${GREEN}All components are already installed!${NC}\n"
     echo -e "${CYAN}You can run ./start-tidal.sh to start TidalCycles.${NC}\n"
     exit 0
@@ -190,6 +217,8 @@ echo -e "${CYAN}Components to install:${NC}"
 [ "$NEEDS_SUPERCOLLIDER" = true ] && echo -e "  ${YELLOW}•${NC} SuperCollider (manual install required)"
 [ "$NEEDS_SUPERDIRT" = true ] && echo -e "  ${YELLOW}•${NC} SuperDirt quark"
 [ "$NEEDS_VOWEL" = true ] && echo -e "  ${YELLOW}•${NC} Vowel quark"
+[ "$NEEDS_PULSAR" = true ] && echo -e "  ${YELLOW}•${NC} Pulsar editor"
+[ "$NEEDS_PULSAR_PLUGIN" = true ] && echo -e "  ${YELLOW}•${NC} TidalCycles plugin for Pulsar"
 echo ""
 
 # Ask for confirmation
@@ -477,6 +506,208 @@ EOF
     echo ""
 fi
 
+# Install Pulsar
+if [ "$NEEDS_PULSAR" = true ]; then
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}Step: Installing Pulsar Editor${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+    
+    echo -e "${CYAN}Pulsar is a text editor with built-in support for TidalCycles.${NC}\n"
+    
+    if command_exists brew; then
+        echo -e "${CYAN}Installing Pulsar via Homebrew...${NC}\n"
+        echo -e "${YELLOW}This will download and install Pulsar.${NC}\n"
+        
+        read -p "Press Enter to install Pulsar via Homebrew... "
+        
+        brew install --cask pulsar || {
+            echo -e "${RED}Error: Failed to install Pulsar via Homebrew${NC}"
+            echo -e "${YELLOW}Falling back to manual installation instructions...${NC}\n"
+            echo -e "${CYAN}Please install Pulsar manually:${NC}"
+            echo -e "  1. Visit: ${BLUE}https://pulsar-edit.dev/download${NC}"
+            echo -e "  2. Download the macOS version"
+            echo -e "  3. Open the .dmg file and drag Pulsar to Applications"
+            echo -e "  4. Run this script again to install the TidalCycles plugin\n"
+            read -p "Press Enter after you've installed Pulsar manually... "
+        }
+        
+        if dir_exists "/Applications/Pulsar.app"; then
+            echo -e "${GREEN}✓ Pulsar installed successfully!${NC}\n"
+            # Mark plugin as needed since Pulsar was just installed
+            NEEDS_PULSAR_PLUGIN=true
+        else
+            echo -e "${YELLOW}⚠ Pulsar installation may have failed.${NC}"
+            echo -e "${CYAN}Please verify Pulsar is in /Applications/Pulsar.app${NC}\n"
+            read -p "Press Enter to continue anyway... "
+        fi
+    else
+        echo -e "${YELLOW}Homebrew not found. Manual installation required.${NC}\n"
+        echo -e "${CYAN}Please install Pulsar manually:${NC}"
+        echo -e "  1. Visit: ${BLUE}https://pulsar-edit.dev/download${NC}"
+        echo -e "  2. Download the macOS version"
+        echo -e "  3. Open the .dmg file and drag Pulsar to Applications"
+        echo -e "  4. Or install Homebrew first: ${BLUE}https://brew.sh${NC}\n"
+        echo -e "${CYAN}After installing Pulsar, run this script again to install the TidalCycles plugin.${NC}\n"
+        read -p "Press Enter after you've installed Pulsar... "
+        
+        if ! dir_exists "/Applications/Pulsar.app"; then
+            echo -e "${YELLOW}⚠ Pulsar not found in /Applications/Pulsar.app${NC}"
+            echo -e "${CYAN}Please make sure Pulsar is installed before continuing.${NC}\n"
+            read -p "Press Enter to continue anyway, or Ctrl+C to exit and install Pulsar... "
+        else
+            # Mark plugin as needed since Pulsar was just installed
+            NEEDS_PULSAR_PLUGIN=true
+        fi
+    fi
+fi
+
+# Install TidalCycles plugin for Pulsar
+if [ "$NEEDS_PULSAR_PLUGIN" = true ]; then
+    if ! dir_exists "/Applications/Pulsar.app"; then
+        echo -e "${YELLOW}⚠ Pulsar not found. Skipping plugin installation.${NC}"
+        echo -e "${CYAN}Install Pulsar first, then run this script again.${NC}\n"
+    else
+        echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+        echo -e "${BLUE}Step: Installing TidalCycles Plugin for Pulsar${NC}"
+        echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+        
+        echo -e "${CYAN}The TidalCycles plugin enables Tidal support in Pulsar.${NC}\n"
+        
+        # Check if Pulsar's package manager (apm) is available
+        PULSAR_APM="/Applications/Pulsar.app/Contents/Resources/app/apm/bin/apm"
+        
+        if [ -f "$PULSAR_APM" ]; then
+            echo -e "${CYAN}Installing TidalCycles plugin via Pulsar's package manager...${NC}\n"
+            
+            # Install the plugin
+            "$PULSAR_APM" install tidalcycles || {
+                echo -e "${YELLOW}⚠ Package manager installation failed. Trying alternative method...${NC}\n"
+                
+                # Alternative: Install via git clone
+                echo -e "${CYAN}Trying alternative installation method...${NC}"
+                PULSAR_PACKAGES_DIR="$HOME/.pulsar/packages"
+                mkdir -p "$PULSAR_PACKAGES_DIR"
+                
+                if [ -d "$PULSAR_PACKAGES_DIR/tidalcycles" ]; then
+                    echo -e "${GREEN}✓ TidalCycles plugin already exists${NC}\n"
+                else
+                    echo -e "${CYAN}Cloning TidalCycles plugin from GitHub...${NC}"
+                    cd "$PULSAR_PACKAGES_DIR"
+                    git clone https://github.com/tidalcycles/pulsar-tidalcycles.git tidalcycles || {
+                        echo -e "${RED}Error: Failed to clone TidalCycles plugin${NC}"
+                        echo -e "${YELLOW}Please install manually:${NC}"
+                        echo -e "  1. Open Pulsar"
+                        echo -e "  2. Go to ${BLUE}Packages → Settings View → Install Packages/Themes${NC}"
+                        echo -e "  3. Search for 'tidalcycles' and install\n"
+                        read -p "Press Enter to continue... "
+                    }
+                    
+                    if [ -d "$PULSAR_PACKAGES_DIR/tidalcycles" ]; then
+                        echo -e "${CYAN}Installing plugin dependencies...${NC}"
+                        cd "$PULSAR_PACKAGES_DIR/tidalcycles"
+                        npm install || {
+                            echo -e "${YELLOW}⚠ npm install failed. Plugin may still work.${NC}"
+                        }
+                        echo -e "${GREEN}✓ TidalCycles plugin installed${NC}\n"
+                    fi
+                fi
+            }
+            
+            # Verify installation
+            if [ -d "$HOME/.pulsar/packages/tidalcycles" ]; then
+                echo -e "${GREEN}✓ TidalCycles plugin verified${NC}\n"
+            else
+                echo -e "${YELLOW}⚠ Plugin installation may have failed.${NC}"
+                echo -e "${CYAN}You can install it manually in Pulsar:${NC}"
+                echo -e "  ${BLUE}Packages → Settings View → Install Packages/Themes${NC}"
+                echo -e "  Search for 'tidalcycles' and install\n"
+            fi
+        else
+            echo -e "${YELLOW}⚠ Pulsar package manager not found.${NC}"
+            echo -e "${CYAN}Installing plugin manually...${NC}\n"
+            
+            PULSAR_PACKAGES_DIR="$HOME/.pulsar/packages"
+            mkdir -p "$PULSAR_PACKAGES_DIR"
+            
+            if [ -d "$PULSAR_PACKAGES_DIR/tidalcycles" ]; then
+                echo -e "${GREEN}✓ TidalCycles plugin already exists${NC}\n"
+            else
+                echo -e "${CYAN}Cloning TidalCycles plugin from GitHub...${NC}"
+                cd "$PULSAR_PACKAGES_DIR"
+                git clone https://github.com/tidalcycles/pulsar-tidalcycles.git tidalcycles || {
+                    echo -e "${RED}Error: Failed to clone TidalCycles plugin${NC}"
+                    echo -e "${YELLOW}Please install manually in Pulsar:${NC}"
+                    echo -e "  ${BLUE}Packages → Settings View → Install Packages/Themes${NC}"
+                    echo -e "  Search for 'tidalcycles' and install\n"
+                    read -p "Press Enter to continue... "
+                }
+                
+                if [ -d "$PULSAR_PACKAGES_DIR/tidalcycles" ]; then
+                    echo -e "${CYAN}Installing plugin dependencies...${NC}"
+                    cd "$PULSAR_PACKAGES_DIR/tidalcycles"
+                    if command_exists npm; then
+                        npm install || {
+                            echo -e "${YELLOW}⚠ npm install failed. Plugin may still work.${NC}"
+                        }
+                    else
+                        echo -e "${YELLOW}⚠ npm not found. Plugin dependencies may not be installed.${NC}"
+                        echo -e "${CYAN}You may need to install Node.js/npm for the plugin to work fully.${NC}"
+                    fi
+                    echo -e "${GREEN}✓ TidalCycles plugin installed${NC}\n"
+                fi
+            fi
+        fi
+        
+        echo -e "${CYAN}Plugin installation complete!${NC}"
+        echo -e "${YELLOW}Note: You may need to restart Pulsar for the plugin to be fully active.${NC}\n"
+        
+        # Create command-line alias for easy Pulsar launching
+        echo -e "${CYAN}Setting up command-line access...${NC}"
+        
+        # Create a symlink in /usr/local/bin if it doesn't exist and we have permissions
+        if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
+            if [ ! -f "/usr/local/bin/pulsar" ]; then
+                ln -sf "/Applications/Pulsar.app/Contents/Resources/app/pulsar.sh" "/usr/local/bin/pulsar" 2>/dev/null && {
+                    echo -e "${GREEN}✓ Created /usr/local/bin/pulsar command${NC}"
+                    echo -e "${CYAN}You can now type 'pulsar' in terminal to launch Pulsar${NC}\n"
+                } || {
+                    echo -e "${YELLOW}⚠ Could not create symlink (may need sudo)${NC}\n"
+                }
+            else
+                echo -e "${GREEN}✓ Pulsar command already exists${NC}\n"
+            fi
+        else
+            # Add to shell config as an alias
+            SHELL_CONFIG=""
+            if [ -f "$HOME/.zshrc" ]; then
+                SHELL_CONFIG="$HOME/.zshrc"
+            elif [ -f "$HOME/.bashrc" ]; then
+                SHELL_CONFIG="$HOME/.bashrc"
+            elif [ -f "$HOME/.bash_profile" ]; then
+                SHELL_CONFIG="$HOME/.bash_profile"
+            fi
+            
+            if [ -n "$SHELL_CONFIG" ]; then
+                if ! grep -q "alias pulsar=" "$SHELL_CONFIG"; then
+                    echo "" >> "$SHELL_CONFIG"
+                    echo "# Pulsar editor alias" >> "$SHELL_CONFIG"
+                    echo "alias pulsar='open -a Pulsar'" >> "$SHELL_CONFIG"
+                    echo -e "${GREEN}✓ Added 'pulsar' alias to $SHELL_CONFIG${NC}"
+                    echo -e "${CYAN}You can now type 'pulsar' in terminal to launch Pulsar${NC}"
+                    echo -e "${CYAN}(Restart your terminal or run: source $SHELL_CONFIG)${NC}\n"
+                else
+                    echo -e "${GREEN}✓ Pulsar alias already exists in $SHELL_CONFIG${NC}\n"
+                fi
+            else
+                echo -e "${YELLOW}⚠ Could not set up command-line alias${NC}"
+                echo -e "${CYAN}You can launch Pulsar with: ${YELLOW}open -a Pulsar${NC}\n"
+            fi
+        fi
+        
+        read -p "Press Enter to continue... "
+    fi
+fi
+
 # Final summary
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${BLUE}🎉 Installation Complete! 🎉${NC}"
@@ -497,6 +728,11 @@ fi
 if [ "$NEEDS_SUPERDIRT" = true ] || [ "$NEEDS_VOWEL" = true ]; then
     echo -e "${YELLOW}2. Restart SuperCollider${NC}"
     echo -e "   ${CYAN}(Quit and reopen to load the newly installed quarks)${NC}\n"
+fi
+
+if [ "$NEEDS_PULSAR" = true ] || [ "$NEEDS_PULSAR_PLUGIN" = true ]; then
+    echo -e "${YELLOW}2. Restart Pulsar${NC}"
+    echo -e "   ${CYAN}(Quit and reopen to load the TidalCycles plugin)${NC}\n"
 fi
 
 echo -e "${YELLOW}3. Start TidalCycles${NC}"
