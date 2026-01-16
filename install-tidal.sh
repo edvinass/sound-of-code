@@ -237,8 +237,20 @@ fi
 
 # Install Haskell via ghcup
 if [ "$NEEDS_HASKELL" = true ]; then
-    echo -e "${BLUE}Installing Haskell (ghcup)...${NC}"
-    echo -e "${YELLOW}This may take 20-30 minutes...${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}Step: Installing Haskell (ghcup)${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+    
+    echo -e "${CYAN}Haskell is required for TidalCycles.${NC}"
+    echo -e "${CYAN}We'll install it using ghcup (the Haskell toolchain installer).${NC}\n"
+    echo -e "${YELLOW}⚠ This installation takes 20-30 minutes.${NC}"
+    echo -e "${CYAN}You'll see many messages about downloading and compiling.${NC}"
+    echo -e "${CYAN}This is normal - please be patient!${NC}\n"
+    
+    read -p "Press Enter to start Haskell installation... "
+    
+    echo -e "\n${YELLOW}Installing ghcup and Haskell...${NC}"
+    echo -e "${CYAN}(This will take a while - grab a coffee!)${NC}\n"
     
     # Install ghcup
     curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh || {
@@ -254,22 +266,30 @@ if [ "$NEEDS_HASKELL" = true ]; then
         if [ -f "$HOME/.zshrc" ]; then
             if ! grep -q ".ghcup/env" "$HOME/.zshrc"; then
                 echo '. $HOME/.ghcup/env' >> "$HOME/.zshrc"
+                echo -e "${GREEN}✓ Added ghcup to ~/.zshrc${NC}"
             fi
         elif [ -f "$HOME/.bashrc" ]; then
             if ! grep -q ".ghcup/env" "$HOME/.bashrc"; then
                 echo '. $HOME/.ghcup/env' >> "$HOME/.bashrc"
+                echo -e "${GREEN}✓ Added ghcup to ~/.bashrc${NC}"
             fi
         fi
     fi
     
-    echo -e "${GREEN}✓ Haskell (ghcup) installed${NC}"
-    echo -e "${YELLOW}Note: You may need to restart your terminal or run: source ~/.ghcup/env${NC}\n"
+    echo -e "\n${GREEN}✓ Haskell (ghcup) installed${NC}"
+    echo -e "${YELLOW}Note: You may need to restart your terminal for changes to take effect.${NC}"
+    echo -e "${CYAN}Or run: ${YELLOW}source ~/.ghcup/env${NC}\n"
+    
+    read -p "Press Enter to continue... "
 fi
 
 # Install TidalCycles
 if [ "$NEEDS_TIDAL" = true ]; then
-    echo -e "${BLUE}Installing TidalCycles...${NC}"
-    echo -e "${YELLOW}This may take a while...${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}Step: Installing TidalCycles${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+    
+    echo -e "${CYAN}TidalCycles is the pattern language for live coding.${NC}\n"
     
     # Source ghcup env if available
     if [ -f "$HOME/.ghcup/env" ]; then
@@ -278,16 +298,36 @@ if [ "$NEEDS_TIDAL" = true ]; then
     
     if ! command_exists cabal; then
         echo -e "${RED}Error: cabal not found. Please install Haskell first.${NC}"
+        echo -e "${YELLOW}Try running: source ~/.ghcup/env${NC}"
         exit 1
     fi
     
-    cabal update
-    cabal v1-install tidal || {
-        echo -e "${RED}Error: Failed to install TidalCycles${NC}"
+    echo -e "${CYAN}This will:${NC}"
+    echo -e "  1. Update the package database"
+    echo -e "  2. Download and compile TidalCycles"
+    echo -e "  3. Install TidalCycles globally\n"
+    echo -e "${YELLOW}This may take 5-15 minutes...${NC}\n"
+    
+    read -p "Press Enter to start TidalCycles installation... "
+    
+    echo -e "\n${YELLOW}Updating package database...${NC}"
+    cabal update || {
+        echo -e "${RED}Error: Failed to update package database${NC}"
         exit 1
     }
     
-    echo -e "${GREEN}✓ TidalCycles installed${NC}\n"
+    echo -e "\n${YELLOW}Installing TidalCycles...${NC}"
+    echo -e "${CYAN}(This will compile from source - be patient!)${NC}\n"
+    
+    cabal v1-install tidal || {
+        echo -e "${RED}Error: Failed to install TidalCycles${NC}"
+        echo -e "${YELLOW}You may need to check your internet connection or try again.${NC}"
+        exit 1
+    }
+    
+    echo -e "\n${GREEN}✓ TidalCycles installed successfully!${NC}\n"
+    
+    read -p "Press Enter to continue... "
 fi
 
 # Install SuperCollider quarks (SuperDirt and Vowel)
@@ -438,10 +478,46 @@ EOF
 fi
 
 # Final summary
-echo -e "${BLUE}=== Installation Complete ===${NC}\n"
-echo -e "${GREEN}Installation finished!${NC}\n"
-echo -e "${CYAN}Next steps:${NC}"
-echo -e "1. If you installed Haskell, restart your terminal or run: ${YELLOW}source ~/.ghcup/env${NC}"
-echo -e "2. If you installed SuperCollider quarks, restart SuperCollider"
-echo -e "3. Run ${YELLOW}./start-tidal.sh${NC} to start TidalCycles"
-echo ""
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+echo -e "${BLUE}🎉 Installation Complete! 🎉${NC}"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+
+echo -e "${GREEN}All required components have been installed (or were already present).${NC}\n"
+
+echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+echo -e "${CYAN}Next Steps:${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}\n"
+
+if [ "$NEEDS_HASKELL" = true ]; then
+    echo -e "${YELLOW}1. Restart your terminal${NC}"
+    echo -e "   ${CYAN}Or run: ${YELLOW}source ~/.ghcup/env${NC}"
+    echo -e "   ${CYAN}(This loads Haskell into your current session)${NC}\n"
+fi
+
+if [ "$NEEDS_SUPERDIRT" = true ] || [ "$NEEDS_VOWEL" = true ]; then
+    echo -e "${YELLOW}2. Restart SuperCollider${NC}"
+    echo -e "   ${CYAN}(Quit and reopen to load the newly installed quarks)${NC}\n"
+fi
+
+echo -e "${YELLOW}3. Start TidalCycles${NC}"
+echo -e "   ${CYAN}Run: ${GREEN}./start-tidal.sh${NC}"
+echo -e "   ${CYAN}This will:${NC}"
+echo -e "     • Launch SuperCollider with SuperDirt"
+echo -e "     • Open Pulsar (or your editor)"
+echo -e "     • Show you how to boot Tidal\n"
+
+echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+echo -e "${CYAN}Quick Test:${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}\n"
+echo -e "${CYAN}After starting TidalCycles, try this pattern:${NC}\n"
+echo -e "${GREEN}d1 \$ sound \"bd sn\"${NC}\n"
+echo -e "${CYAN}You should hear a kick and snare drum loop!${NC}\n"
+
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+echo -e "${BLUE}Need Help?${NC}"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}\n"
+echo -e "${CYAN}• See ${YELLOW}README-STARTUP.md${NC} ${CYAN}for startup troubleshooting${NC}"
+echo -e "${CYAN}• See ${YELLOW}START-Tidal.md${NC} ${CYAN}for detailed startup instructions${NC}"
+echo -e "${CYAN}• See ${YELLOW}INSTALL-macOS.md${NC} ${CYAN}for installation details${NC}\n"
+
+echo -e "${GREEN}Happy coding! 🎵${NC}\n"
