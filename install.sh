@@ -110,8 +110,11 @@ fi
 # 5. Check SuperDirt and Vowel quarks
 echo -e "${YELLOW}[5/6] Checking SuperCollider Quarks (SuperDirt, Vowel)...${NC}"
 if dir_exists "/Applications/SuperCollider.app"; then
+    # Clean up any old temp files first
+    rm -f /tmp/check_quarks_*.scd 2>/dev/null || true
+    
     # Create a temporary SuperCollider script to check quarks
-    TEMP_SC_SCRIPT=$(mktemp /tmp/check_quarks_XXXXXX.scd)
+    TEMP_SC_SCRIPT=$(mktemp /tmp/check_quarks_XXXXXX.scd 2>/dev/null || echo "/tmp/check_quarks_$$.scd")
     
     cat > "$TEMP_SC_SCRIPT" << 'EOF'
 (
@@ -446,8 +449,11 @@ if [ "$NEEDS_SUPERDIRT" = true ] || [ "$NEEDS_VOWEL" = true ]; then
     echo -e "\n${YELLOW}Verifying installation...${NC}"
     sleep 2
     
+    # Clean up any old temp files first
+    rm -f /tmp/verify_quarks_*.scd 2>/dev/null || true
+    
     # Create verification script
-    TEMP_VERIFY_SCRIPT=$(mktemp /tmp/verify_quarks_XXXXXX.scd)
+    TEMP_VERIFY_SCRIPT=$(mktemp /tmp/verify_quarks_XXXXXX.scd 2>/dev/null || echo "/tmp/verify_quarks_$$.scd")
     cat > "$TEMP_VERIFY_SCRIPT" << 'EOF'
 (
 var quarks = Quarks.installed;
