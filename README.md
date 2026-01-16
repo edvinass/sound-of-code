@@ -4,6 +4,7 @@ This repository is set up for **live coding with SuperCollider + TidalCycles** a
 
 ### For Humans
 
+- **🚀 Beginner Tutorial**: Start here! See [`TUTORIAL-Beginner.md`](TUTORIAL-Beginner.md) for a step-by-step guide to making your first sounds.
 - **Quick Install**: Run `./install-tidal.sh` to automatically install all required components (macOS only).
 - **Installation Guide**: See [`INSTALL-macOS.md`](INSTALL-macOS.md) for detailed macOS setup instructions.
 - **Starting Tidal**: Run `./start-tidal.sh` or see [`START-Tidal.md`](START-Tidal.md) for manual startup instructions.
